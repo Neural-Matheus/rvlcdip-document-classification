@@ -1,0 +1,44 @@
+{
+  "layoutlmv3": {
+    "accuracy": 0.866875,
+    "macro_f1": 0.8671445302362248,
+    "top_confusions": [
+      [
+        "invoice",
+        "form",
+        16
+      ],
+      [
+        "news article",
+        "scientific publication",
+        15
+      ],
+      [
+        "scientific report",
+        "budget",
+        14
+      ],
+      [
+        "form",
+        "invoice",
+        13
+      ],
+      [
+        "scientific report",
+        "presentation",
+        13
+      ],
+      [
+        "news article",
+        "presentation",
+        13
+      ]
+    ]
+  },
+  "dit_visiononly_same_test": {
+    "accuracy": 0.9321875,
+    "macro_f1": 0.9323079775794668
+  },
+  "n_train_per_class": 400,
+  "n_test_per_class": 200
+}

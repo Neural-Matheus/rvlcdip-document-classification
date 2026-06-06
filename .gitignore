@@ -1,0 +1,26 @@
+# dados e caches (pesados, reproduzíveis)
+data/raw_subset/
+data/*.csv
+data/label_names.txt
+.hf_cache/
+.mplconfig/
+.cache/
+.EasyOCR/
+.local/
+.nv/
+.ipython/
+.jupyter/
+*.log
+
+# resultados gerados (mantenha só o que quiser versionar)
+results/predictions/
+results/metrics/*.npz
+
+# python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+
+relatorio_final.tex
+data/

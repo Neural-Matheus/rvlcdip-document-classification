@@ -1,0 +1,98 @@
+[
+  {
+    "run": "deit_tiny_lp",
+    "family": "transformer",
+    "pretrain": "imagenet",
+    "accuracy": 0.5766875,
+    "macro_f1": 0.568105739254043,
+    "params_M": 5.527504,
+    "gflops": 1.0793904,
+    "img_per_s": 1498.6104847565555,
+    "train_time_s": 957.3193988800049,
+    "peak_vram_mb": 141.107712
+  },
+  {
+    "run": "dit_base_lp",
+    "family": "transformer",
+    "pretrain": "domain",
+    "accuracy": 0.5810625,
+    "macro_f1": 0.5733896362747154,
+    "params_M": 85.820944,
+    "gflops": 17.581231872,
+    "img_per_s": 188.88875394149403,
+    "train_time_s": 1159.2556862831116,
+    "peak_vram_mb": 1066.312192
+  },
+  {
+    "run": "baseline_cnn",
+    "family": "cnn",
+    "pretrain": "none",
+    "accuracy": 0.7590625,
+    "macro_f1": 0.7568056327574575,
+    "params_M": 0.28952,
+    "gflops": 1.904381952,
+    "img_per_s": 1453.3104790201953,
+    "train_time_s": 1547.1505651474,
+    "peak_vram_mb": 1020.998144
+  },
+  {
+    "run": "resnet18",
+    "family": "cnn",
+    "pretrain": "imagenet",
+    "accuracy": 0.79825,
+    "macro_f1": 0.7995636698640564,
+    "params_M": 11.18472,
+    "gflops": 1.818562048,
+    "img_per_s": 4890.104784528616,
+    "train_time_s": 885.0266518592834,
+    "peak_vram_mb": 635.856384
+  },
+  {
+    "run": "mobilevit_s",
+    "family": "hybrid",
+    "pretrain": "imagenet",
+    "accuracy": 0.8385625,
+    "macro_f1": 0.8387631229176354,
+    "params_M": 4.947888,
+    "gflops": 1.441329216,
+    "img_per_s": 611.8532876616159,
+    "train_time_s": 1500.558765888214,
+    "peak_vram_mb": 2436.09344
+  },
+  {
+    "run": "deit_tiny",
+    "family": "transformer",
+    "pretrain": "imagenet",
+    "accuracy": 0.8495,
+    "macro_f1": 0.8500178005437162,
+    "params_M": 5.527504,
+    "gflops": 1.0793904,
+    "img_per_s": 1432.5642020459907,
+    "train_time_s": 994.0636310577393,
+    "peak_vram_mb": 707.522048
+  },
+  {
+    "run": "dit_base",
+    "family": "transformer",
+    "pretrain": "domain",
+    "accuracy": 0.89475,
+    "macro_f1": 0.8948661422116357,
+    "params_M": 85.820944,
+    "gflops": 17.581231872,
+    "img_per_s": 190.51680652259282,
+    "train_time_s": 3766.845011949539,
+    "peak_vram_mb": 2175.683584
+  },
+  {
+    "run": "dit_rvlcdip_ref",
+    "family": "transformer",
+    "pretrain": "domain+rvlcdip",
+    "accuracy": 0.930625,
+    "macro_f1": 0.9306830759128648,
+    "params_M": 85.820176,
+    "gflops": 17.581231872,
+    "img_per_s": 187.96211005114358,
+    "train_time_s": 0.0020906925201416016,
+    "peak_vram_mb": 765.895168
+  }
+]

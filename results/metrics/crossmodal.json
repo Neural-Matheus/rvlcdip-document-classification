@@ -1,0 +1,58 @@
+{
+  "crossmodal_fusion": {
+    "accuracy": 0.93,
+    "macro_f1": 0.9299385949032866,
+    "val_acc": 0.94875
+  },
+  "streams": [
+    "dit_vision",
+    "layoutlmv3",
+    "donut_encoder"
+  ],
+  "feature_dims": {
+    "dit": 768,
+    "llv3": 768,
+    "donut": 1024
+  },
+  "comparison_acc": {
+    "crossmodal_fusion": 0.93,
+    "dit_vision": 0.9321875,
+    "layoutlmv3": 0.8746875,
+    "donut": 0.9503125,
+    "late_fusion_best": 0.9525,
+    "moe_best": 0.950625
+  },
+  "oracle_any_correct": 0.974375,
+  "top_confusions": [
+    [
+      "form",
+      "invoice",
+      11
+    ],
+    [
+      "presentation",
+      "scientific report",
+      10
+    ],
+    [
+      "presentation",
+      "news article",
+      9
+    ],
+    [
+      "scientific report",
+      "scientific publication",
+      8
+    ],
+    [
+      "questionnaire",
+      "form",
+      8
+    ],
+    [
+      "scientific report",
+      "presentation",
+      7
+    ]
+  ]
+}

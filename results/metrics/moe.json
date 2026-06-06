@@ -1,0 +1,38 @@
+{
+  "individual_acc": {
+    "dit": 0.9321875,
+    "ll": 0.8746875,
+    "dn": 0.9503125
+  },
+  "best_individual": "dn",
+  "oracle_any_correct": 0.974375,
+  "methods_acc": {
+    "soft_avg_3": 0.9471875,
+    "calibrada_avg": 0.949375,
+    "per_class_weighted": 0.94875,
+    "stacking_rich_lr": 0.950625,
+    "stacking_gb": 0.93875,
+    "hard_router": 0.949375,
+    "soft_moe_gate": 0.9453125
+  },
+  "best_method": "stacking_rich_lr",
+  "best_method_acc": 0.950625,
+  "best_method_macro_f1": 0.9506287240373678,
+  "gain_over_best_individual_pp": 0.03,
+  "oracle_gap_closed_frac": 0.013,
+  "temperatures": {
+    "dit": 0.8,
+    "ll": 1.8,
+    "dn": null
+  },
+  "router_pick_rate": {
+    "dit": 0.0125,
+    "ll": 0.8778125,
+    "dn": 0.1096875
+  },
+  "gate_mean_weight": {
+    "dit": 0.13527552783489227,
+    "ll": 0.7944290041923523,
+    "dn": 0.07029546052217484
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "donut_rvlcdip": {
+    "accuracy": 0.952375,
+    "macro_f1": 0.9523461651901894,
+    "n_per_class": 500
+  },
+  "qwen2vl_2b_zeroshot": {
+    "accuracy": 0.5225,
+    "macro_f1": 0.48607246355383205,
+    "n_per_class": 100
+  }
+}

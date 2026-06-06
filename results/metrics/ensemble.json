@@ -1,0 +1,82 @@
+{
+  "test_set": {
+    "n_per_class": 200,
+    "n_total": 3200
+  },
+  "individual": {
+    "dit_vision": {
+      "accuracy": 0.9321875,
+      "macro_f1": 0.9323079775794668
+    },
+    "layoutlmv3": {
+      "accuracy": 0.8746875,
+      "macro_f1": 0.874379074982436
+    },
+    "donut": {
+      "accuracy": 0.9503125,
+      "macro_f1": 0.9503300209120902
+    }
+  },
+  "ensembles": {
+    "soft_avg_dit_ll": {
+      "accuracy": 0.8971875,
+      "macro_f1": 0.8969422203657068
+    },
+    "soft_weighted_dit_ll": {
+      "accuracy": 0.935625,
+      "macro_f1": 0.9357211914211956
+    },
+    "soft_avg_3": {
+      "accuracy": 0.949375,
+      "macro_f1": 0.9493721491724365
+    },
+    "stacking_lr": {
+      "accuracy": 0.9525,
+      "macro_f1": 0.9524612667571772
+    }
+  },
+  "best_weight_dit": 0.65,
+  "best_individual": "donut",
+  "best_ensemble": "stacking_lr",
+  "best_ensemble_acc": 0.9525,
+  "best_ensemble_macro_f1": 0.9524612667571772,
+  "gain_over_best_individual_pp": 0.22,
+  "oracle_any_correct": 0.974375,
+  "pairwise_agreement": {
+    "dit_vs_ll": 0.8728125,
+    "dit_vs_donut": 0.941875,
+    "ll_vs_donut": 0.8815625
+  },
+  "top_confusions": [
+    [
+      "form",
+      "invoice",
+      10
+    ],
+    [
+      "presentation",
+      "scientific report",
+      10
+    ],
+    [
+      "scientific report",
+      "scientific publication",
+      6
+    ],
+    [
+      "specification",
+      "form",
+      5
+    ],
+    [
+      "form",
+      "letter",
+      4
+    ],
+    [
+      "scientific report",
+      "form",
+      4
+    ]
+  ]
+}
