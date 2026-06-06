@@ -1,66 +1,126 @@
-# Classificação de Imagem de Documento — RVL-CDIP
+# Classificação de Imagens de Documentos — RVL-CDIP
 
-Projeto final: **o que pesa mais em classificação de imagem de documento — o viés
-indutivo da arquitetura (CNN × transformer) ou a relevância do pré-treino
-(nenhum → ImageNet → domínio de documentos)?**
+Estudo comparativo na base pública **RVL-CDIP** (16 classes de documentos
+digitalizados). Em vez de treinar um único modelo, o trabalho é organizado em
+**seis eixos experimentais**, cada um isolando um fator de projeto, sob um
+protocolo de treino e avaliação comum e totalmente reprodutível (Docker).
 
-A tese é que o salto **ImageNet → domínio** (DiT, pré-treino auto-supervisionado em
-42M de imagens de documento) supera as diferenças entre arquiteturas.
+Pergunta central: **o que pesa mais — o viés indutivo da arquitetura
+(CNN × Transformer) ou o regime de pré-treino (nenhum → ImageNet → domínio de
+documentos)?** A resposta curta: o salto **ImageNet → domínio** (DiT,
+pré-treino auto-supervisionado em documentos) supera as diferenças entre
+arquiteturas.
+
+## Eixos
+
+1. **Arquitetura × pré-treino** — CNN do zero, ResNet-18, DeiT-Tiny, MobileViT-S,
+   DiT-base e a referência DiT já ajustada no RVL-CDIP; *full fine-tuning* vs.
+   *linear probing*.
+2. **Eficiência de dados** — acurácia em função de *N* imagens/classe
+   (*N* ∈ {50, 100, 250, 500, 1000, 2000}).
+3. **Interpretabilidade** — Grad-CAM (CNN) vs. *attention rollout* (DiT).
+4. **Multimodal** — LayoutLMv3 (imagem + OCR + *layout*) vs. visão pura.
+5. **VLM** — especialista *fine-tuned* (Donut) vs. generalista *zero-shot*
+   (Qwen2-VL 2B).
+6. **Fusão multimodal** — *late-fusion*, *Mixture-of-Experts* e fusão
+   *cross-modal* treinada vs. o melhor especialista isolado.
+
+## Resultados principais
+
+Acurácia no conjunto de teste (subset balanceado; ver "Escala").
+
+| Modelo | Eixo / modalidade | Acc | macro-F1 |
+|---|---|---:|---:|
+| Donut (RVL-CDIP) | VLM / imagem (gerativo) | **0,952** | 0,952 |
+| DiT (mesmo teste multimodal) | multimodal / imagem | 0,932 | 0,932 |
+| DiT-RVL-CDIP (referência) | arquitetura / imagem | 0,931 | 0,931 |
+| DiT-base (treinado aqui) | arquitetura / imagem | 0,895 | 0,895 |
+| LayoutLMv3 | multimodal / imagem+OCR+layout | 0,867 | 0,867 |
+| DeiT-Tiny | arquitetura / imagem | 0,850 | 0,850 |
+| MobileViT-S | arquitetura / imagem | 0,839 | 0,839 |
+| ResNet-18 | arquitetura / imagem | 0,798 | 0,800 |
+| CNN (do zero) | arquitetura / imagem | 0,759 | 0,757 |
+| Qwen2-VL 2B (*zero-shot*) | VLM / imagem (gerativo) | 0,522 | 0,486 |
+
+Achados centrais:
+
+- **Pré-treino de domínio domina:** o DiT-base (0,895) supera todas as demais
+  arquiteturas treinadas, e com apenas 50 imagens/classe já bate a CNN treinada
+  com 1000/classe.
+- **Adaptação importa:** o *linear probing* das *features* de domínio (≈0,58)
+  fica abaixo de todos os modelos com *fine-tune* completo.
+- **Fusão não compensa quando os especialistas são redundantes:** a melhor fusão
+  (*stacking*, 0,9525) supera o melhor especialista isolado (Donut, 0,9503) por
+  apenas ~0,2 pp, muito aquém do teto-oráculo (0,974).
 
 ## Como rodar (Docker)
 
-Tudo roda em container com GPU. A imagem base é `pytorch/pytorch:2.4.0-cuda12.4`.
+Tudo executa em container com GPU. Imagem base `pytorch/pytorch:2.4.0-cuda12.4`.
 
 ```bash
-# 1. construir a imagem (instala timm/transformers/datasets/...)
+# 1. construir a imagem (timm/transformers/datasets/easyocr/...)
 docker compose build
 
-# 2. subir o container (fica vivo em background; usa a GPU 1, ~19 GB livres)
+# 2. subir o container (fica vivo em background)
 docker compose up -d
 
-# 3. smoke test — valida modelos, treino, Grad-CAM e attention rollout (dados sintéticos)
+# 3. smoke test — valida modelos, treino, Grad-CAM e rollout (dados sintéticos)
 docker compose exec -T rvlcdip python -m scripts.smoke_test
 
 # 4. construir o subset balanceado (streaming + seed=42, salvo em data/)
-#    tamanhos via env (por classe). Default cheio = 2000/250/500.
-docker compose exec -T -e N_TRAIN=250 -e N_VAL=50 -e N_TEST=100 \
+#    tamanhos por classe via env (default 2000/250/500 treino/val/teste)
+docker compose exec -T -e N_TRAIN=2000 -e N_VAL=250 -e N_TEST=500 \
     rvlcdip python -m scripts.build_subset
 
 # 5. rodar a grade de experimentos (arquitetura × pré-treino + linear probing)
 docker compose exec -T rvlcdip python -m scripts.run_experiments
-# ... ou só alguns: ... run_experiments dit_base dit_rvlcdip_ref
 ```
 
-Resultados em `results/metrics/*.json` (+ `summary.json`) e figuras em `results/plots/`.
+Para reproduzir **todos os eixos** de uma vez (constrói o subset, roda grade,
+eficiência, interpretabilidade, multimodal, VLM e fusão, e consolida):
 
-### Por que Docker e não venv
-A máquina não tem PyTorch no Python do sistema e o build do Ubuntu não tem DNS;
-a imagem `pytorch/pytorch` já traz torch+CUDA e o `pip` instala o resto com
-`network: host`. O container roda com o **UID/GID do host** (`user: 1031:1031`),
-então `data/` e `results/` ficam do usuário, não de root.
+```bash
+docker compose exec -T rvlcdip bash scripts/run_scaleup.sh
+```
 
-## Escala / VRAM
-- Default do compose aponta a **GPU 1** (a 0 costuma estar ocupada nesta máquina).
-- AMP ligado; **gradient checkpointing** no DiT-base (86M) para caber com folga em ~19 GB.
-- O subset é configurável por env (`N_TRAIN/N_VAL/N_TEST` por classe). O run mostrado
-  no relatório usou um subset reduzido por tempo de download (streaming ~3,5 img/s);
-  para o resultado "cheio" do brief use `N_TRAIN=2000 N_VAL=250 N_TEST=500`.
+As métricas saem em `results/metrics/*.json` e as figuras em `results/plots/`.
+Os notebooks `notebooks/00`–`07` consolidam e visualizam cada eixo a partir
+desses arquivos (não re-treinam — apenas leem os resultados).
 
 ## Estrutura
+
 ```
-src/        config, data (streaming+subset+transforms), models, training, analysis
-scripts/    smoke_test, build_subset, run_experiments
-results/    metrics/ plots/ predictions/
-data/       raw_subset/ + train/val/test.csv (gitignored)
+src/         config, data (streaming + subset + transforms), models, training, analysis, multimodal
+scripts/     pipeline: build_subset, run_experiments, efficiency_curve, interpretability,
+             run_layoutlmv3, run_vlm, run_ensemble, run_moe, run_crossmodal, consolidate,
+             make_figures, smoke_test, run_scaleup.sh
+notebooks/   00–07, um por eixo (com saídas embutidas)
+results/     metrics/*.json + plots/*.png
+data/        subset gerado pelo pipeline (não versionado)
 ```
 
-## Decisões de implementação (3 pontos do brief)
-1. **Fallback de dataset** (`src/data.py`): tenta `aharley/rvl_cdip` (loading script,
-   `trust_remote_code`) e cai automaticamente para mirrors parquet; **lê os nomes das
-   classes do próprio dataset**, nunca hardcodados.
-2. **Attention rollout robusto p/ DiT/BEiT** (`src/analysis.py`): usa as atenções
-   pós-softmax do modelo (`output_attentions=True`), que já incorporam o
-   *relative position bias*, com fusão de cabeças + resíduo + renormalização.
-3. **Linear probing mantido** (Exp 5): mede quanto do ganho do DiT é "feature pronta"
-   vs. adaptação. MobileViT é o candidato a corte se faltar tempo.
-```
+## Escala / GPU
+
+- O subset é configurável por *env* (`N_TRAIN`/`N_VAL`/`N_TEST` por classe). O
+  carregamento é por *streaming* da Hugging Face, então o tamanho do subset
+  determina o tempo de preparo dos dados.
+- AMP (precisão mista) habilitado; o `docker-compose.yml` isola a GPU via
+  `device_ids` — ajuste o índice conforme a sua máquina (dentro do container o
+  dispositivo é sempre `cuda:0`).
+
+## Detalhes de implementação
+
+- **Carregamento de dados resiliente** (`src/data.py`): tenta o *loading script*
+  oficial e cai para *mirrors* parquet automaticamente; os nomes das classes são
+  lidos do próprio dataset, nunca *hardcoded*.
+- **Attention rollout para DiT/BEiT** (`src/analysis.py`): usa as atenções
+  pós-*softmax* (que já incorporam o *relative position bias*), com fusão de
+  cabeças, resíduo e renormalização.
+- **Estabilidade do LayoutLMv3** (`src/multimodal.py`): treino em BF16 com
+  *gradient clipping* e *warmup*/decaimento — em FP16 a perda divergia (NaN) e o
+  modelo colapsava para uma única classe.
+
+## Stack
+
+PyTorch · timm · Hugging Face Transformers/Datasets · EasyOCR · scikit-learn ·
+matplotlib · Jupyter — orquestrado via Docker Compose.
